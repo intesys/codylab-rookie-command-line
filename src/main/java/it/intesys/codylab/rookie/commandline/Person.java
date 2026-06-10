@@ -36,9 +36,14 @@ public class Person {
         } else {
             return "Person (id: " + id  + ")";
         }
-
-
     }
 
+    public static void resetLastId () {
+        lastId = 0;
+    }
+
+    public static void incrementLastId (int lastIdIncrement) {
+        lastId += lastIdIncrement;
+    }
 
 }

@@ -2,6 +2,8 @@ package it.intesys.codylab.rookie.commandline;
 
 public class Main {
     void main() throws InterruptedException {
+        Person.incrementLastId(7);
+
         Person p = new Person();
         p.name = "Samuele";
         p.surname = "Bortolotti";
