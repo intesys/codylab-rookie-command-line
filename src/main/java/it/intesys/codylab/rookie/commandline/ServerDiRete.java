@@ -65,11 +65,10 @@ public class ServerDiRete {
     }
 
 
-    private static boolean process(List<Person> persons) {
+    private static void process(List<Person> persons) {
         for (Person person : persons) {
             System.out.println(person.toString(true));
         }
-        return true;
     }
 
     private static List<Person> readInput(Socket socket) throws IOException {
