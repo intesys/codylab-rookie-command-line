@@ -15,6 +15,10 @@ public class RigaDiComando {
     public static final String INSTANT_PATTERN = "d MMMM uuuu HH:mm";
     public static final Locale INSTANT_LOCALE = Locale.ITALIAN;
     public static final String INSTANT_TIME_ZONE = "Europe/Rome";
+    static DateTimeFormatter instantFormatter = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive() // accetta "Giugno" o "giugno"
+            .appendPattern(INSTANT_PATTERN)
+            .toFormatter(INSTANT_LOCALE);
 
     static void main(String[] arguments) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -44,7 +48,7 @@ public class RigaDiComando {
     }
 
 
-    private static ArrayList<Person> readInput(String[] arguments) {
+    static ArrayList<Person> readInput(String[] arguments) {
         ArrayList<Person> persons = new ArrayList<Person>();
 
         for (int i = 0; i < arguments.length; i++){
@@ -80,16 +84,10 @@ public class RigaDiComando {
 
     private static void error(String arguments) {
         System.err.printf("Unknown argument: %s%n", arguments);
-        System.exit(-1);
     }
 
     private static Instant parseInstant (String s) {
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive() // accetta "Giugno" o "giugno"
-                .appendPattern(INSTANT_PATTERN)
-                .toFormatter(INSTANT_LOCALE);
-
-        LocalDateTime ldt = LocalDateTime.parse(s, formatter);
+        LocalDateTime ldt = LocalDateTime.parse(s, instantFormatter);
 
         // Scegli il fuso corretto del tuo contesto applicativo
         return ldt.atZone(ZoneId.of(INSTANT_TIME_ZONE)).toInstant();
