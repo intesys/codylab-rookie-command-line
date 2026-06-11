@@ -81,15 +81,11 @@ public class RigaDiComando {
                     persons.add(person);
                     break;
                 default:
-                    error(arguments[i]);
+                    break;
             }
         }
 
         return persons;
-    }
-
-    private static void error(String arguments) {
-        System.err.printf("Unknown argument: %s%n", arguments);
     }
 
     static Instant parseInstant (String s) {

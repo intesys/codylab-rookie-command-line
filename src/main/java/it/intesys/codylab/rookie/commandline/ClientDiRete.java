@@ -1,10 +1,7 @@
 package it.intesys.codylab.rookie.commandline;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClientDiRete {
@@ -26,10 +23,36 @@ public class ClientDiRete {
     }
 
     private static void process(Socket socket) throws IOException {
+        send(socket);
+        socket.shutdownOutput();
+        String outcome = receiveOutcome(socket);
+        if (outcome.isEmpty()) {
+            System.err.println("No result");
+        } else if (!outcome.equalsIgnoreCase("OK"))
+            System.err.println(outcome);
+    }
+
+    private static void send(Socket socket) throws IOException {
         Writer writer = new OutputStreamWriter(socket.getOutputStream());
         for (int i = 0; i < persone.size(); i++) {
-            write (persone.get(i), writer);
+            write(persone.get(i), writer);
         }
+    }
+
+    private static String receiveOutcome(Socket socket) throws IOException {
+        Reader reader = new InputStreamReader(socket.getInputStream());
+        return receiveOutcome(reader);
+    }
+
+    private static String receiveOutcome(Reader reader) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        int chAsInt;
+        char ch;
+        while ((chAsInt = reader.read()) != -1) {
+            ch = (char) chAsInt;
+            stringBuilder.append(ch);
+        }
+        return stringBuilder.toString();
     }
 
     private static void write(Person person, Writer writer) throws IOException {

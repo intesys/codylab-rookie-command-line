@@ -1,9 +1,6 @@
 package it.intesys.codylab.rookie.commandline;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -35,8 +32,30 @@ public class ServerDiRete {
 
     private static void process(Socket socket) throws IOException {
         List<Person> persone = readInput(socket);
-        boolean outcome = process(persone);
-        System.out.printf("Risultato: %b\n", outcome);
+        String outcome = randomOutcome();
+        System.out.printf("Risultato: %s\n", outcome);
+        if (outcome.equalsIgnoreCase("OK"))
+            process(persone);
+        writeOutcome (socket, outcome);
+    }
+
+    private static void writeOutcome(Socket socket, String outcome) throws IOException {
+        Writer writer = new OutputStreamWriter(socket.getOutputStream());
+        writer.write(outcome);
+        writer.flush();
+    }
+
+    private static String randomOutcome() {
+        int timeModuloDue = (int) System.currentTimeMillis() % 2;
+        String outcome;
+        switch (timeModuloDue) {
+            case 0:
+                outcome = "OK";
+                break;
+            default:
+                outcome = "ERROR";
+        }
+        return outcome;
     }
 
 
