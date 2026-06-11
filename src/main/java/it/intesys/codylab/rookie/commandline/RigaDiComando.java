@@ -1,5 +1,8 @@
 package it.intesys.codylab.rookie.commandline;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,7 +16,16 @@ public class RigaDiComando {
     public static final Locale INSTANT_LOCALE = Locale.ITALIAN;
     public static final String INSTANT_TIME_ZONE = "Europe/Rome";
 
-    static void main(String[] arguments)  {
+    static void main(String[] arguments) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Proseguo? ");
+        String input = in.readLine();
+
+        if (!input.equalsIgnoreCase("ok")) {
+            System.err.println(input);
+            System.exit(1);
+        }
+
         //interpretazione dell'intput
         ArrayList<Person> persons = readInput(arguments);
 
