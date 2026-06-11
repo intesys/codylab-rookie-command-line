@@ -6,9 +6,11 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class RigaDiComando {
@@ -31,7 +33,7 @@ public class RigaDiComando {
         }
 
         //interpretazione dell'intput
-        ArrayList<Person> persons = readInput(arguments);
+        List<Person> persons = readArguments(arguments);
 
         //elaborazione
         boolean process = process(persons);
@@ -40,7 +42,7 @@ public class RigaDiComando {
         System.out.printf("OK: %b", process);
     }
 
-    private static boolean process(ArrayList<Person> persons) {
+    private static boolean process(List<Person> persons) {
         for (Person person : persons) {
             System.out.println(person.toString(true));
         }
@@ -48,11 +50,13 @@ public class RigaDiComando {
     }
 
 
-    static ArrayList<Person> readInput(String[] arguments) {
+    static List<Person> readArguments(String[] arguments) {
         ArrayList<Person> persons = new ArrayList<Person>();
 
         for (int i = 0; i < arguments.length; i++){
             switch (arguments[i]){
+                case "":
+                    break;
                 case "--person":
                     Person person = new Person();
                     PERSON: for (i++; i < arguments.length; i++) {
@@ -66,6 +70,8 @@ public class RigaDiComando {
                             case "-registrationDate":
                                 String registrationDateString = arguments[++i];
                                 person.registrationDate = parseInstant (registrationDateString);
+                                break;
+                            case "":
                                 break;
                             default:
                                 i--;
@@ -86,10 +92,15 @@ public class RigaDiComando {
         System.err.printf("Unknown argument: %s%n", arguments);
     }
 
-    private static Instant parseInstant (String s) {
+    static Instant parseInstant (String s) {
         LocalDateTime ldt = LocalDateTime.parse(s, instantFormatter);
 
         // Scegli il fuso corretto del tuo contesto applicativo
         return ldt.atZone(ZoneId.of(INSTANT_TIME_ZONE)).toInstant();
+    }
+
+    static String formatInstant (Instant instant) {
+        ZonedDateTime ldt = instant.atZone(ZoneId.of(INSTANT_TIME_ZONE));
+        return ldt.format(instantFormatter);
     }
 }

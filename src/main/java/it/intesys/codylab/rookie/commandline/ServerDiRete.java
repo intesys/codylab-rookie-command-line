@@ -1,6 +1,7 @@
 package it.intesys.codylab.rookie.commandline;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.ServerSocket;
@@ -8,10 +9,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.intesys.codylab.rookie.commandline.RigaDiComando.readInput;
-
 public class ServerDiRete {
     static int port;
+    static int numberOfClients = 0;
 
     static void main(String[] arguments) throws IOException {
         read(arguments);
@@ -21,19 +21,40 @@ public class ServerDiRete {
 
     private static void process() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.printf("Pronto per ricevere connessioni sulla porta %d\n", port);
             process(serverSocket);
         }
     }
 
     private static void process(ServerSocket serverSocket) throws IOException {
-        Socket socket = serverSocket.accept();
-        System.out.printf("Connessione ricevuta da %s", socket.getInetAddress());
-        process (socket);
+        for (;;) try (Socket socket = serverSocket.accept()) {
+            System.out.printf("Connessione n. %d ricevuta da %s\n", ++numberOfClients, socket.getInetAddress());
+            process(socket);
+        }
     }
 
     private static void process(Socket socket) throws IOException {
-        Reader reader = new InputStreamReader(socket.getInputStream());
-        List<String> arguments = new ArrayList<>();
+        List<Person> persone = readInput(socket);
+        boolean outcome = process(persone);
+        System.out.printf("Risultato: %b\n", outcome);
+    }
+
+
+    private static boolean process(List<Person> persons) {
+        for (Person person : persons) {
+            System.out.println(person.toString(true));
+        }
+        return true;
+    }
+
+    private static List<Person> readInput(Socket socket) throws IOException {
+        String[] arguments = readInput(socket.getInputStream());
+        return RigaDiComando.readArguments(arguments);
+    }
+
+    private static String[] readInput(InputStream inputStream) throws IOException {
+        Reader reader = new InputStreamReader(inputStream);
+        List<String> argumentsList = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         int chAsInt;
         char ch;
@@ -45,12 +66,12 @@ public class ServerDiRete {
                     if (insideQuote) {
                         stringBuilder.append(ch);
                     } else {
-                        addArgument(stringBuilder, arguments);
+                        addArgument(stringBuilder, argumentsList);
                     }
                     break;
                 case '"':
                     if (insideQuote) {
-                        addArgument(stringBuilder, arguments);
+                        addArgument(stringBuilder, argumentsList);
                     }
                     insideQuote = !insideQuote;
                     break;
@@ -58,6 +79,8 @@ public class ServerDiRete {
                     stringBuilder.append(ch);
             }
         }
+
+        return argumentsList.toArray(new String[0]);
     }
 
     private static void addArgument(StringBuilder stringBuilder, List<String> arguments) {

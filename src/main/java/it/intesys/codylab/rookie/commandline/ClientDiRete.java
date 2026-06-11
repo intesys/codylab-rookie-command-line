@@ -5,11 +5,12 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientDiRete {
     static String server;
     static int port;
-    private static ArrayList<Person> persone;
+    private static List<Person> persone;
 
     static void main(String [] arguments) throws IOException {
         read (arguments);
@@ -32,13 +33,27 @@ public class ClientDiRete {
     }
 
     private static void write(Person person, Writer writer) throws IOException {
+        System.out.printf("Sending %s", person.toString(true));
+        writer.write('"');
         writer.write("--person");
+        writer.write('"');
+        writer.write(' ');
         writer.write ("-name");
+        writer.write(' ');
         writer.write (person.name);
+        writer.write(' ');
         writer.write ("-surname");
+        writer.write(' ');
         writer.write (person.surname);
+        writer.write(' ');
         writer.write ("-registrationDate");
-        writer.write (RigaDiComando.instantFormatter.format(person.registrationDate));
+        writer.write(' ');
+        writer.write('"');
+        writer.write (RigaDiComando.formatInstant(person.registrationDate));
+        writer.write('"');
+        writer.write(' ');
+        writer.flush();
+        System.out.println("Sent");
     }
 
     private static void read(String[] arguments) {
@@ -51,7 +66,7 @@ public class ClientDiRete {
                     port = Integer.parseInt(arguments[++i]);
                     break;
                 default:
-                    persone = RigaDiComando.readInput(arguments);
+                    persone = RigaDiComando.readArguments(arguments);
             }
         }
 
