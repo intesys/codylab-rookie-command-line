@@ -5,10 +5,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerDiRete {
     static int port;
     static int numberOfClients = 0;
+    static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 / 2);
 
     static void main(String[] arguments) throws IOException {
         read(arguments);
@@ -24,19 +27,22 @@ public class ServerDiRete {
     }
 
     private static void process(ServerSocket serverSocket) throws IOException {
-        for (;;) try (Socket socket = serverSocket.accept()) {
+        for (;;) {
+            Socket socket = serverSocket.accept();
             System.out.printf("Connessione n. %d ricevuta da %s\n", ++numberOfClients, socket.getInetAddress());
-            process(socket);
+            threadPool.submit(new ClientProcessing(socket));
         }
     }
 
     private static void process(Socket socket) throws IOException {
-        List<Person> persone = readInput(socket);
-        String outcome = randomOutcome();
-        System.out.printf("Risultato: %s\n", outcome);
-        if (outcome.equalsIgnoreCase("OK"))
-            process(persone);
-        writeOutcome (socket, outcome);
+        try (socket) {
+            List<Person> persone = readInput(socket);
+            String outcome = randomOutcome();
+            System.out.printf("Risultato: %s\n", outcome);
+            if (outcome.equalsIgnoreCase("OK"))
+                process(persone);
+            writeOutcome(socket, outcome);
+        }
     }
 
     private static void writeOutcome(Socket socket, String outcome) throws IOException {
@@ -130,5 +136,21 @@ public class ServerDiRete {
         System.exit(2);
     }
 
+    static class ClientProcessing implements Runnable {
+        Socket socket;
+
+        ClientProcessing (Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try {
+                process(socket);
+            }  catch (IOException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
 
 }

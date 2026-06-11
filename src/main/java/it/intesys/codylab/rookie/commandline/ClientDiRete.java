@@ -16,8 +16,9 @@ public class ClientDiRete {
 
     private static void process(String localhost, int port) throws IOException {
         try (Socket socket = new Socket()) {
-            socket.connect(new java.net.InetSocketAddress(localhost, port));
-
+            final int oneMinute = 1000 * 60 * 10;
+            socket.connect(new java.net.InetSocketAddress(localhost, port), oneMinute);
+            socket.setSoTimeout(oneMinute);
             process(socket);
         }
     }
