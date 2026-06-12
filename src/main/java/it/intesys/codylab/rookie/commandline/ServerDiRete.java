@@ -1,8 +1,15 @@
 package it.intesys.codylab.rookie.commandline;
 
+import org.postgresql.ds.PGSimpleDataSource;
+
+import javax.sql.DataSource;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -12,6 +19,7 @@ public class ServerDiRete {
     static int port;
     static int numberOfClients = 0;
     static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 / 2);
+    static DataSource datasource;
 
     static void main(String[] arguments) throws IOException {
         read(arguments);
@@ -34,7 +42,7 @@ public class ServerDiRete {
         }
     }
 
-    private static void process(Socket socket) throws IOException {
+    private static void process(Socket socket) throws IOException, SQLException {
         try (socket) {
             List<Person> persone = readInput(socket);
             String outcome = randomOutcome();
@@ -65,9 +73,30 @@ public class ServerDiRete {
     }
 
 
-    private static void process(List<Person> persons) {
+    private static void process(List<Person> persons) throws SQLException {
         for (Person person : persons) {
-            System.out.println(person.toString(true));
+            process(person);
+        }
+    }
+
+    private static void process(Person person) throws SQLException {
+        try (Connection connection = datasource.getConnection()) {
+            String sql = """
+                            INSERT INTO person 
+                                (id, name, surname, registration_date)
+                            VALUES 
+                                (?, ?, ?, ?)
+                    """;
+            try (PreparedStatement query = connection.prepareStatement(sql)) {
+                query.setLong(1, person.id);
+                query.setString(2, person.name);
+                query.setString(3, person.surname);
+                query.setTimestamp(4, Timestamp.from(person.registrationDate));
+
+                int rowUpdated = query.executeUpdate();
+                if (rowUpdated != 1)
+                    System.err.printf("Error inserting person %s: %d rows updated\n", person.toString(true), rowUpdated);
+            }
         }
     }
 
@@ -115,10 +144,28 @@ public class ServerDiRete {
 
 
     private static void read(String[] arguments) {
+        String pgHost = null, pgUsername = null, pgPassword = null, pgDatabase = null;
+        int pgPort = 0;
+
         for (int i = 0; i < arguments.length; i++) {
             switch (arguments[i]) {
                 case "--port":
                     port = Integer.parseInt(arguments[++i]);
+                    break;
+                case "--pg-host":
+                    pgHost = arguments[++i];
+                    break;
+                case "--pg-port":
+                    pgPort = Integer.parseInt(arguments[++i]);
+                    break;
+                case "--pg-username":
+                    pgUsername = arguments[++i];
+                    break;
+                case "--pg-password":
+                    pgPassword = arguments[++i];
+                    break;
+                case "--pg-database":
+                    pgDatabase = arguments[++i];
                     break;
                 default:
                     System.err.println("Unknown argument: " + arguments[i]);
@@ -127,7 +174,26 @@ public class ServerDiRete {
         }
 
         if (port == 0)
-            argumentsError ("port");
+            argumentsError ("--port");
+        if (pgHost == null)
+            argumentsError ("--pg-host");
+        if (pgPort == 0)
+            argumentsError ("--pg-port");
+        if (pgUsername == null)
+            argumentsError ("--pg-username");
+        if (pgPassword == null)
+            argumentsError ("--pg-password");
+        if (pgDatabase == null)
+            argumentsError ("--pg-database");
+
+        PGSimpleDataSource pgDataSource = new PGSimpleDataSource();
+        pgDataSource.setServerName(pgHost);
+        pgDataSource.setPortNumber(pgPort);
+        pgDataSource.setUser(pgUsername);
+        pgDataSource.setPassword(pgPassword);
+        pgDataSource.setDatabaseName(pgDatabase);
+
+        datasource = pgDataSource;
     }
 
     private static void argumentsError(String server) {
@@ -148,6 +214,8 @@ public class ServerDiRete {
                 process(socket);
             }  catch (IOException e) {
                 System.err.println(e.getMessage());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
     }
