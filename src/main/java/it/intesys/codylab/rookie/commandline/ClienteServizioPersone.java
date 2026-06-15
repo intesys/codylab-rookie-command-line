@@ -4,48 +4,50 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
-public class ClientDiRete {
-    static String server;
-    static int port;
-    private static List<Person> persone;
+public class ClienteServizioPersone {
+    final String server;
+    final int port;
+    Socket socket;
+    List<Person> persone;
 
-    static void main(String [] arguments) throws IOException {
-        read (arguments);
-        process(server, port);
+    public ClienteServizioPersone(String server, int port) {
+        this.server = server;
+        this.port = port;
     }
 
-    private static void process(String localhost, int port) throws IOException {
+    public void process(List<Person> persone) throws IOException {
+        this.persone = persone;
         try (Socket socket = new Socket()) {
             final int oneMinute = 1000 * 60 * 10;
-            socket.connect(new java.net.InetSocketAddress(localhost, port), oneMinute);
+            socket.connect(new java.net.InetSocketAddress(server, port), oneMinute);
             socket.setSoTimeout(oneMinute);
-            process(socket);
+            process();
         }
     }
 
-    private static void process(Socket socket) throws IOException {
-        send(socket);
+    private void process() throws IOException {
+        send();
         socket.shutdownOutput();
-        String outcome = receiveOutcome(socket);
+        String outcome = receiveOutcome();
         if (outcome.isEmpty()) {
             System.err.println("No result");
         } else if (!outcome.equalsIgnoreCase("OK"))
             System.err.println(outcome);
     }
 
-    private static void send(Socket socket) throws IOException {
+    private void send() throws IOException {
         Writer writer = new OutputStreamWriter(socket.getOutputStream());
         for (int i = 0; i < persone.size(); i++) {
             write(persone.get(i), writer);
         }
     }
 
-    private static String receiveOutcome(Socket socket) throws IOException {
+    private String receiveOutcome() throws IOException {
         Reader reader = new InputStreamReader(socket.getInputStream());
         return receiveOutcome(reader);
     }
 
-    private static String receiveOutcome(Reader reader) throws IOException {
+    private String receiveOutcome(Reader reader) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         int chAsInt;
         char ch;
@@ -56,7 +58,7 @@ public class ClientDiRete {
         return stringBuilder.toString();
     }
 
-    private static void write(Person person, Writer writer) throws IOException {
+    private void write(Person person, Writer writer) throws IOException {
         System.out.printf("Sending %s", person.toString(true));
         writer.write('"');
         writer.write("--person");
@@ -78,32 +80,5 @@ public class ClientDiRete {
         writer.write(' ');
         writer.flush();
         System.out.println("Sent");
-    }
-
-    private static void read(String[] arguments) {
-        for (int i = 0; i < arguments.length; i++) {
-            switch (arguments[i]) {
-                case "--server":
-                    server = arguments[++i];
-                    break;
-                case "--port":
-                    port = Integer.parseInt(arguments[++i]);
-                    break;
-                default:
-                    persone = RigaDiComando.readArguments(arguments);
-            }
-        }
-
-        if (server == null)
-            argumentsError ("server");
-
-        if (port == 0)
-            argumentsError ("port");
-
-    }
-
-    private static void argumentsError(String server) {
-        System.err.printf("%s obbligatorio", server);
-        System.exit(2);
-    }
+    }    
 }
