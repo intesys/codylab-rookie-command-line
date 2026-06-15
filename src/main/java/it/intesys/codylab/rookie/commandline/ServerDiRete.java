@@ -1,5 +1,6 @@
 package it.intesys.codylab.rookie.commandline;
 
+import it.intesys.codylab.rookie.domain.Person;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
@@ -20,10 +21,11 @@ public class ServerDiRete {
     int port;
     int numberOfClients = 0;
     ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 / 2);
+
     List<Object> servizi;
 
     static void main(String[] arguments) throws Exception {
-        ServerDiRete serverDiRete = read(arguments);
+        ServerDiRete serverDiRete = bootstrap(arguments);
         System.out.printf("La porta è %d\n", serverDiRete.port);
         serverDiRete.process();
     }
@@ -127,7 +129,7 @@ public class ServerDiRete {
     }
 
 
-    private static ServerDiRete read(String[] arguments) throws Exception {
+    private static ServerDiRete bootstrap(String[] arguments) throws Exception {
         ServerDiRete serverDiRete = new ServerDiRete();
 
         String pgHost = null, pgUsername = null, pgPassword = null, pgDatabase = null;
@@ -209,7 +211,7 @@ public class ServerDiRete {
     void discoverServices(DataSource dataSource) throws Exception {
         servizi = new ArrayList<>();
 
-        String packageName = "it.intesys.codylab.rookie.commandline";
+        String packageName = "it.intesys.codylab.rookie.commandline.service";
         String path = packageName.replace('.', '/');
 
         URL url = ClassLoader.getSystemClassLoader().getResource(path);

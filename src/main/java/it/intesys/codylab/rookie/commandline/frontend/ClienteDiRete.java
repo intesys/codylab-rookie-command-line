@@ -1,4 +1,7 @@
-package it.intesys.codylab.rookie.commandline;
+package it.intesys.codylab.rookie.commandline.frontend;
+
+import it.intesys.codylab.rookie.commandline.RigaDiComando;
+import it.intesys.codylab.rookie.domain.Person;
 
 import java.io.IOException;
 import java.util.List;

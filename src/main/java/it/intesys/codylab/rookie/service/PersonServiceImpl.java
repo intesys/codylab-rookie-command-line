@@ -1,4 +1,8 @@
-package it.intesys.codylab.rookie.commandline;
+package it.intesys.codylab.rookie.service;
+
+import it.intesys.codylab.rookie.commandline.Servizio;
+import it.intesys.codylab.rookie.domain.Person;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -9,10 +13,14 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Servizio
-public class ServizioPersone implements InterfacciaServizioPersone {
-    final DataSource datasource;
+@Service
+public class PersonServiceImpl implements PersonService {
+    DataSource datasource;
 
-    public ServizioPersone(DataSource datasource) {
+    public PersonServiceImpl() {
+    }
+
+    public PersonServiceImpl(DataSource datasource) {
         this.datasource = datasource;
     }
 

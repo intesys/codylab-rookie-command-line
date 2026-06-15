@@ -1,10 +1,14 @@
-package it.intesys.codylab.rookie.commandline;
+package it.intesys.codylab.rookie.commandline.frontend;
+
+import it.intesys.codylab.rookie.commandline.RigaDiComando;
+import it.intesys.codylab.rookie.domain.Person;
+import it.intesys.codylab.rookie.service.PersonService;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
-public class ClienteServizioPersone implements InterfacciaServizioPersone {
+public class ClienteServizioPersone implements PersonService {
     final String server;
     final int port;
     Socket socket;

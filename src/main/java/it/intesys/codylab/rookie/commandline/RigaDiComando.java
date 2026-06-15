@@ -1,5 +1,7 @@
 package it.intesys.codylab.rookie.commandline;
 
+import it.intesys.codylab.rookie.domain.Person;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -50,7 +52,7 @@ public class RigaDiComando {
     }
 
 
-    static List<Person> readArguments(String[] arguments) {
+    public static List<Person> readArguments(String[] arguments) {
         ArrayList<Person> persons = new ArrayList<Person>();
 
         for (int i = 0; i < arguments.length; i++){
@@ -95,7 +97,7 @@ public class RigaDiComando {
         return ldt.atZone(ZoneId.of(INSTANT_TIME_ZONE)).toInstant();
     }
 
-    static String formatInstant (Instant instant) {
+    public static String formatInstant(Instant instant) {
         ZonedDateTime ldt = instant.atZone(ZoneId.of(INSTANT_TIME_ZONE));
         return ldt.format(instantFormatter);
     }

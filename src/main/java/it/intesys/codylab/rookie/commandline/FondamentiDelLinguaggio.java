@@ -1,5 +1,7 @@
 package it.intesys.codylab.rookie.commandline;
 
+import it.intesys.codylab.rookie.domain.Person;
+
 public class FondamentiDelLinguaggio {
     static void main(String [] arguments) throws InterruptedException {
         Person.incrementLastId(7);
