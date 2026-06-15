@@ -1,6 +1,7 @@
 package it.intesys.codylab.rookie.commandline;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,16 +9,20 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Servizio
-public class ServizioPersone {
+public class ServizioPersone implements InterfacciaServizioPersone {
     final DataSource datasource;
 
     public ServizioPersone(DataSource datasource) {
         this.datasource = datasource;
     }
 
-    public void process(List<Person> persons) throws SQLException {
+    public void process(List<Person> persons) throws IOException {
         for (Person person : persons) {
-            process(person);
+            try {
+                process(person);
+            } catch (SQLException e) {
+                throw new IOException(e);
+            }
         }
     }
 

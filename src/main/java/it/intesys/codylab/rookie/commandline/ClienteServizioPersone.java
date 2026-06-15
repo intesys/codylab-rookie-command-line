@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
-public class ClienteServizioPersone {
+public class ClienteServizioPersone implements InterfacciaServizioPersone {
     final String server;
     final int port;
     Socket socket;
