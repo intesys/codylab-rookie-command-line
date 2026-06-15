@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+@Servizio
 public class ServizioPersone {
     final DataSource datasource;
 
@@ -14,16 +15,10 @@ public class ServizioPersone {
         this.datasource = datasource;
     }
 
-    public String process(List<Person> persons) throws SQLException {
-        String outcome = randomOutcome();
-        System.out.printf("Risultato: %s\n", outcome);
-        if (outcome.equalsIgnoreCase("OK")) {
-            for (Person person : persons) {
-                process(person);
-            }
-
+    public void process(List<Person> persons) throws SQLException {
+        for (Person person : persons) {
+            process(person);
         }
-        return outcome;
     }
 
     private void process(Person person) throws SQLException {
@@ -46,19 +41,4 @@ public class ServizioPersone {
             }
         }
     }
-
-
-    private String randomOutcome() {
-        int timeModuloDue = (int) System.currentTimeMillis() % 2;
-        String outcome;
-        switch (timeModuloDue) {
-            case 0:
-                outcome = "OK";
-                break;
-            default:
-                outcome = "ERROR";
-        }
-        return outcome;
-    }
-
 }

@@ -18,6 +18,7 @@ public class ClienteServizioPersone {
     public void process(List<Person> persone) throws IOException {
         this.persone = persone;
         try (Socket socket = new Socket()) {
+            this.socket = socket;
             final int oneMinute = 1000 * 60 * 10;
             socket.connect(new java.net.InetSocketAddress(server, port), oneMinute);
             socket.setSoTimeout(oneMinute);

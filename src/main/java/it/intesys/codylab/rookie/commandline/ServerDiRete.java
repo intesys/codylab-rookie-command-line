@@ -2,9 +2,14 @@ package it.intesys.codylab.rookie.commandline;
 
 import org.postgresql.ds.PGSimpleDataSource;
 
+import javax.sql.DataSource;
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +20,12 @@ public class ServerDiRete {
     int port;
     int numberOfClients = 0;
     ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 / 2);
-    ServizioPersone servizioPersone;
+    List<Object> servizi;
 
-    static void main(String[] arguments) throws IOException {
+    static void main(String[] arguments) throws Exception {
         ServerDiRete serverDiRete = read(arguments);
         System.out.printf("La porta è %d\n", serverDiRete.port);
-        serverDiRete.process ();
+        serverDiRete.process();
     }
 
     private void process() throws IOException {
@@ -38,12 +43,36 @@ public class ServerDiRete {
         }
     }
 
-    private void process(Socket socket) throws IOException, SQLException {
+    private void process(Socket socket) throws IOException, SQLException, InvocationTargetException, IllegalAccessException {
         try (socket) {
             List<Person> persone = readInput(socket);
-            String outcome = servizioPersone.process(persone);
+            String outcome = dispatch(persone);
             writeOutcome(socket, outcome);
         }
+    }
+
+    public String dispatch(Object argument) throws IllegalAccessException {
+        for (Object servizio : servizi) {
+            Method[] methods = servizio.getClass().getMethods();
+            for (Method method : methods) {
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(argument.getClass())) {
+                    try {
+                        method.invoke(servizio, argument);
+                        System.out.printf("Metodo %s invocato sul servizio %s\n", method.getName (), servizio.getClass().getSimpleName());
+                        return "OK";
+                    } catch (InvocationTargetException e) {
+                        Throwable targetException = e.getTargetException();
+                        System.err.printf("Invocazione fallita del metodo %s del servizio %s\n", method.getName (), servizio.getClass().getSimpleName());
+                        System.err.println(targetException.getMessage());
+                        System.err.flush();
+                        return targetException.getMessage();
+                    }
+                }
+            }
+        }
+        System.err.println("Servizio non trovato per process(List<Person>)");
+        return "KO";
     }
 
     private void writeOutcome(Socket socket, String outcome) throws IOException {
@@ -98,8 +127,9 @@ public class ServerDiRete {
     }
 
 
-    private static ServerDiRete read(String[] arguments) {
+    private static ServerDiRete read(String[] arguments) throws Exception {
         ServerDiRete serverDiRete = new ServerDiRete();
+
         String pgHost = null, pgUsername = null, pgPassword = null, pgDatabase = null;
         int pgPort = 0;
 
@@ -149,7 +179,8 @@ public class ServerDiRete {
         pgDataSource.setPassword(pgPassword);
         pgDataSource.setDatabaseName(pgDatabase);
 
-        serverDiRete.servizioPersone = new ServizioPersone(pgDataSource);
+        serverDiRete.discoverServices(pgDataSource);
+
         return serverDiRete;
     }
 
@@ -169,12 +200,33 @@ public class ServerDiRete {
         public void run() {
             try {
                 process(socket);
-            }  catch (IOException e) {
+            }  catch (IOException | SQLException | InvocationTargetException | IllegalAccessException e) {
                 System.err.println(e.getMessage());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         }
     }
 
+    void discoverServices(DataSource dataSource) throws Exception {
+        servizi = new ArrayList<>();
+
+        String packageName = "it.intesys.codylab.rookie.commandline";
+        String path = packageName.replace('.', '/');
+
+        URL url = ClassLoader.getSystemClassLoader().getResource(path);
+        File dir = new File(url.toURI());
+
+        for (File file : dir.listFiles()) {
+            if (file.getName().endsWith(".class")) {
+                String className = packageName + "." + file.getName().replace(".class", "");
+                Class<?> cls = Class.forName(className);
+
+                if (cls.isAnnotationPresent(Servizio.class)) {
+                    System.out.println(cls.getName() + " ha l'annotazione @Servizio");
+                    Constructor<?> constructor = cls.getConstructor(DataSource.class);
+                    Object servizio = constructor.newInstance(dataSource);
+                    servizi.add(servizio);
+                }
+            }
+        }
+    }
 }
