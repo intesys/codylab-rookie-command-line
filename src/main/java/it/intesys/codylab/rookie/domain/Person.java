@@ -3,9 +3,9 @@ package it.intesys.codylab.rookie.domain;
 import java.time.Instant;
 
 public class Person {
-    private static int lastId;
+    private static long lastId;
 
-    public int id;
+    public long id;
     public String name;
     public String surname;
     public Instant registrationDate;
