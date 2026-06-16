@@ -20,6 +20,10 @@
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <postgresql.version>42.6.0</postgresql.version>
+        <openapi-generator-maven-plugin.version>7.18.0</openapi-generator-maven-plugin.version>
+        <swagger-core.version>2.2.30</swagger-core.version>
+        <jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
+        <validation-api.version>2.0.1.Final</validation-api.version>
     </properties>
 
     <dependencies>
@@ -36,7 +40,89 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core-jakarta</artifactId>
+            <version>${swagger-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>${jackson-databind-nullable.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${validation-api.version}</version>
+        </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!--
+                        Plugin that provides API-first development using openapi-generator to
+                        generate Spring-MVC endpoint stubs at compile time from an OpenAPI definition file
+                    -->
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>${openapi-generator-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>server</id>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <inputSpec>${project.basedir}/src/main/resources/api.yml</inputSpec>
+                                <apiPackage>it.intesys.codylab.rookie.web.api</apiPackage>
+                                <modelPackage>it.intesys.codylab.rookie.web.api.model</modelPackage>
+                                <skipValidateSpec>false</skipValidateSpec>
+                                <generateApiTests>false</generateApiTests>
+                                <generateModelTests>false</generateModelTests>
+                                <generatorName>spring</generatorName>
+                                <modelNameSuffix>ApiDTO</modelNameSuffix>
+                                <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+                                <configOptions>
+                                    <delegatePattern>true</delegatePattern>
+                                    <useTags>true</useTags>
+                                    <title>aps</title>
+                                    <serializableModel>true</serializableModel>
+                                    <delegatePattern>true</delegatePattern>
+                                    <useSpringBoot3>true</useSpringBoot3>
+                                    <useJakartaEe>true</useJakartaEe>
+                                    <containerDefaultToNull>true</containerDefaultToNull>
+                                </configOptions>
+                                <!-- tells swagger codegen to use instant instead of OffsetDateTime -->
+                                <typeMappings>
+                                    <typeMapping>OffsetDateTime=Instant</typeMapping>
+                                </typeMappings>
+                                <importMappings>
+                                    <importMapping>java.time.OffsetDateTime=java.time.Instant</importMapping>
+                                </importMappings>
+                                <instantiationTypes>
+                                    <instantiationType>map=java.util.LinkedHashMap</instantiationType>
+                                </instantiationTypes>
+                                <openapiNormalizer>REF_AS_PARENT_IN_ALLOF=true</openapiNormalizer>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
