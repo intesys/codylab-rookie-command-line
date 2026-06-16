@@ -2,6 +2,7 @@ package it.intesys.codylab.rookie.service;
 
 import it.intesys.codylab.rookie.commandline.Servizio;
 import it.intesys.codylab.rookie.domain.Person;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -20,6 +21,7 @@ public class PersonServiceImpl implements PersonService {
     public PersonServiceImpl() {
     }
 
+    @Autowired
     public PersonServiceImpl(DataSource datasource) {
         this.datasource = datasource;
     }

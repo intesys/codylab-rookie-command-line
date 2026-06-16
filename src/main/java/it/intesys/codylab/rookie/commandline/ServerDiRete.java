@@ -1,36 +1,41 @@
 package it.intesys.codylab.rookie.commandline;
 
 import it.intesys.codylab.rookie.domain.Person;
-import org.postgresql.ds.PGSimpleDataSource;
+import it.intesys.codylab.rookie.service.RookieService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Component
+@ConfigurationProperties("server")
 public class ServerDiRete {
     int port;
     int numberOfClients = 0;
     ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3 / 2);
 
-    List<Object> servizi;
+    List<RookieService> servizi;
 
-    static void main(String[] arguments) throws Exception {
-        ServerDiRete serverDiRete = bootstrap(arguments);
-        System.out.printf("La porta è %d\n", serverDiRete.port);
-        serverDiRete.process();
+    ServerDiRete() {
     }
 
-    private void process() throws IOException {
+    @Autowired
+    ServerDiRete(List<RookieService> servizi) {
+        this.servizi = servizi;
+    }
+
+
+    public void process() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.printf("Pronto per ricevere connessioni sulla porta %d\n", port);
             process(serverSocket);
@@ -129,68 +134,6 @@ public class ServerDiRete {
     }
 
 
-    private static ServerDiRete bootstrap(String[] arguments) throws Exception {
-        ServerDiRete serverDiRete = new ServerDiRete();
-
-        String pgHost = null, pgUsername = null, pgPassword = null, pgDatabase = null;
-        int pgPort = 0;
-
-        for (int i = 0; i < arguments.length; i++) {
-            switch (arguments[i]) {
-                case "--port":
-                    serverDiRete.port = Integer.parseInt(arguments[++i]);
-                    break;
-                case "--pg-host":
-                    pgHost = arguments[++i];
-                    break;
-                case "--pg-port":
-                    pgPort = Integer.parseInt(arguments[++i]);
-                    break;
-                case "--pg-username":
-                    pgUsername = arguments[++i];
-                    break;
-                case "--pg-password":
-                    pgPassword = arguments[++i];
-                    break;
-                case "--pg-database":
-                    pgDatabase = arguments[++i];
-                    break;
-                default:
-                    System.err.println("Unknown argument: " + arguments[i]);
-                    System.exit(1);
-            }
-        }
-
-        if (serverDiRete.port == 0)
-            argumentsError ("--port");
-        if (pgHost == null)
-            argumentsError ("--pg-host");
-        if (pgPort == 0)
-            argumentsError ("--pg-port");
-        if (pgUsername == null)
-            argumentsError ("--pg-username");
-        if (pgPassword == null)
-            argumentsError ("--pg-password");
-        if (pgDatabase == null)
-            argumentsError ("--pg-database");
-
-        PGSimpleDataSource pgDataSource = new PGSimpleDataSource();
-        pgDataSource.setServerName(pgHost);
-        pgDataSource.setPortNumber(pgPort);
-        pgDataSource.setUser(pgUsername);
-        pgDataSource.setPassword(pgPassword);
-        pgDataSource.setDatabaseName(pgDatabase);
-
-        serverDiRete.discoverServices(pgDataSource);
-
-        return serverDiRete;
-    }
-
-    private static void argumentsError(String server) {
-        System.err.printf("%s obbligatorio", server);
-        System.exit(2);
-    }
-
     class ClientProcessing implements Runnable {
         Socket socket;
 
@@ -208,27 +151,11 @@ public class ServerDiRete {
         }
     }
 
-    void discoverServices(DataSource dataSource) throws Exception {
-        servizi = new ArrayList<>();
+    public int getPort() {
+        return port;
+    }
 
-        String packageName = "it.intesys.codylab.rookie.commandline.service";
-        String path = packageName.replace('.', '/');
-
-        URL url = ClassLoader.getSystemClassLoader().getResource(path);
-        File dir = new File(url.toURI());
-
-        for (File file : dir.listFiles()) {
-            if (file.getName().endsWith(".class")) {
-                String className = packageName + "." + file.getName().replace(".class", "");
-                Class<?> cls = Class.forName(className);
-
-                if (cls.isAnnotationPresent(Servizio.class)) {
-                    System.out.println(cls.getName() + " ha l'annotazione @Servizio");
-                    Constructor<?> constructor = cls.getConstructor(DataSource.class);
-                    Object servizio = constructor.newInstance(dataSource);
-                    servizi.add(servizio);
-                }
-            }
-        }
+    public void setPort(int port) {
+        this.port = port;
     }
 }
