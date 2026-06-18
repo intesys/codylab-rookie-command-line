@@ -8,6 +8,7 @@ import it.intesys.codylab.rookie.web.api.model.PersonFilterApiDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,8 +74,13 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
     }
 
     @Override
-    public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO personFilterApiDTO) {
-        return null;
+    public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO filterDTO) {
+        List<Person> people = personService.findPeople(filterDTO.getId(), filterDTO.getText());
+        List<PersonApiDTO> peopleDTO = people.stream()
+                .map(this::map)
+                .toList();
+        return ResponseEntity.ok(peopleDTO);
+
     }
 
 }

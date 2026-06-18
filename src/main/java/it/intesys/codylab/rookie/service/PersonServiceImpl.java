@@ -8,6 +8,7 @@ import it.intesys.codylab.rookie.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -55,5 +56,10 @@ public class PersonServiceImpl implements PersonService {
         } else {
             throw new NotFoundException(Person.class, id);
         }
+    }
+
+    @Override
+    public List<Person> findPeople(Long id, String text) {
+        return personRepository.findPeople(id, text);
     }
 }
