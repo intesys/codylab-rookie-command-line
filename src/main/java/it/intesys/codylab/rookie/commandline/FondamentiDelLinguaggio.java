@@ -15,7 +15,7 @@ public class FondamentiDelLinguaggio {
         Thread.sleep(100);
 
         Person p2 = new Person();
-        p2.id = 2;
+        p2.id = 2L;
         p2.name = "Davide";
         p2.surname = "Crema";
         p2.registrationDate = java.time.Instant.now();

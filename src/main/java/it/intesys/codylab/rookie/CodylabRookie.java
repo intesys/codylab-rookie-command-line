@@ -13,4 +13,6 @@ public class CodylabRookie {
         new SpringApplication(CodylabRookie.class)
                 .run(args);
     }
+
+
 }

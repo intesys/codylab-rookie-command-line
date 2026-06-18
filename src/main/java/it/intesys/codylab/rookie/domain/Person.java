@@ -1,11 +1,16 @@
 package it.intesys.codylab.rookie.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 import java.time.Instant;
 
+@Entity
 public class Person {
     private static long lastId;
 
-    public long id;
+    @Id
+    public Long id;
     public String name;
     public String surname;
     public Instant registrationDate;
