@@ -1,6 +1,5 @@
 package it.intesys.codylab.rookie.commandline;
 
-import it.intesys.codylab.rookie.domain.Person;
 import it.intesys.codylab.rookie.service.RookieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;

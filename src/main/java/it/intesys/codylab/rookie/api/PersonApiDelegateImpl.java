@@ -20,7 +20,19 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
 
     @Override
     public ResponseEntity<PersonApiDTO> getPerson(Long id) {
-        return null;
+        Person person = personService.findPerson(id);
+        PersonApiDTO personApiDTO = map (person);
+        return ResponseEntity.ok(personApiDTO);
+    }
+
+    private PersonApiDTO map(Person person) {
+        PersonApiDTO personApiDTO = new PersonApiDTO();
+        personApiDTO.setId(person.id);
+        personApiDTO.setId(person.id);
+        personApiDTO.setName(person.name);
+        personApiDTO.setSurname(person.surname);
+        personApiDTO.setRegistrationDate(person.registrationDate);
+        return personApiDTO;
     }
 
     @Override
@@ -55,11 +67,14 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
 
     @Override
     public ResponseEntity<Void> deletePerson(Long id) {
-        return null;
+        Person person = personService.findPerson (id);
+        personService.deletePerson(person);
+        return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<List<PersonApiDTO>> getListPerson(Integer page, Integer size, String sort, PersonFilterApiDTO personFilterApiDTO) {
+    public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO personFilterApiDTO) {
         return null;
     }
+
 }

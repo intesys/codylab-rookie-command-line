@@ -23,7 +23,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Person'
     put:
@@ -83,7 +83,7 @@ paths:
     post:
       tags:
         - person
-      operationId: getListPerson
+      operationId: findPeople
       parameters:
         - name: page
           in: query

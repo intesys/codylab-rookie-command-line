@@ -6,4 +6,6 @@ public interface PersonService extends RookieService {
     Person createPerson(Person person);
     void updatePerson(Person person);
     void deletePerson(Person person);
+
+    Person findPerson(Long id);
 }
