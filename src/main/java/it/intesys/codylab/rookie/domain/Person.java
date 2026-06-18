@@ -1,13 +1,15 @@
 package it.intesys.codylab.rookie.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.Instant;
 
 @Entity
 public class Person {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     public String name;
     public String surname;

@@ -27,15 +27,16 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
     public ResponseEntity<PersonApiDTO> createPerson(PersonApiDTO personApiDTO) {
         Person person = map(null, personApiDTO);
 
-        personService.createPerson(person);
+        person = personService.createPerson(person);
 
+        personApiDTO.setId(person.id);
         return ResponseEntity.ok(personApiDTO);
     }
 
     private static Person map(Long id, PersonApiDTO personApiDTO) {
         Person person = new Person();
 
-        //person.id = id;
+        person.id = id != null? id : personApiDTO.getId();
         person.name = personApiDTO.getName();
         person.surname = personApiDTO.getSurname();
         person.registrationDate = personApiDTO.getRegistrationDate();
