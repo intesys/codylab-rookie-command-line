@@ -1,7 +1,5 @@
 package it.intesys.codylab.rookie.commandline;
 
-import it.intesys.codylab.rookie.domain.Person;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

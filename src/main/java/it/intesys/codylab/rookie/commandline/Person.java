@@ -1,29 +1,32 @@
-package it.intesys.codylab.rookie.domain;
+package it.intesys.codylab.rookie.commandline;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 import java.time.Instant;
 
-@Entity
 public class Person {
+    private static long lastId;
+
     @Id
     public Long id;
     public String name;
     public String surname;
     public Instant registrationDate;
 
-    public Person () {
-        registrationDate = java.time.Instant.now();
+    public Person() {
+        lastId = lastId + 1;
+        this.id = lastId;
+        registrationDate = Instant.now();
     }
 
-    public Person (String name, String surname) {
+    public Person(String name, String surname) {
         this ();
         this.name = name;
         this.surname = surname;
     }
 
-    public Person (String name, String surname, Instant registrationDate) {
+    public Person(String name, String surname, Instant registrationDate) {
         this (name, surname);
         this.registrationDate = registrationDate;
     }
@@ -37,6 +40,14 @@ public class Person {
         } else {
             return "Person (id: " + id  + ")";
         }
+    }
+
+    public static void resetLastId () {
+        lastId = 0;
+    }
+
+    public static void incrementLastId (int lastIdIncrement) {
+        lastId += lastIdIncrement;
     }
 
 }

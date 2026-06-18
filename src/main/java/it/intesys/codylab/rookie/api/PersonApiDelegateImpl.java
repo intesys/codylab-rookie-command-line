@@ -8,7 +8,6 @@ import it.intesys.codylab.rookie.web.api.model.PersonFilterApiDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -17,7 +16,6 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
 
     public PersonApiDelegateImpl(PersonService personService) {
         this.personService = personService;
-        Person.incrementLastId(100);
     }
 
     @Override
@@ -27,21 +25,31 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
 
     @Override
     public ResponseEntity<PersonApiDTO> createPerson(PersonApiDTO personApiDTO) {
-        try {
-            Person person = new Person();
+        Person person = map(null, personApiDTO);
 
+        personService.createPerson(person);
 
-            person.id = personApiDTO.getId();
-            person.name = personApiDTO.getName();
-            person.surname = personApiDTO.getSurname();
-            person.registrationDate = personApiDTO.getRegistrationDate();
+        return ResponseEntity.ok(personApiDTO);
+    }
 
-            personService.process(List.of (person));
+    private static Person map(Long id, PersonApiDTO personApiDTO) {
+        Person person = new Person();
 
-            return ResponseEntity.ok(personApiDTO);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        //person.id = id;
+        person.name = personApiDTO.getName();
+        person.surname = personApiDTO.getSurname();
+        person.registrationDate = personApiDTO.getRegistrationDate();
+        return person;
+    }
+
+    @Override
+    public ResponseEntity<Void> updatePerson(Long id, PersonApiDTO personApiDTO) {
+        Person person = map(id, personApiDTO);
+
+        personService.updatePerson(person);
+
+        return ResponseEntity.ok().build();
+
     }
 
     @Override

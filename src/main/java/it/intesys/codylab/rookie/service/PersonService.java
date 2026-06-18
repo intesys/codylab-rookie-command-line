@@ -6,5 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PersonService extends RookieService {
-    void process(List<Person> person) throws IOException;
+    void createPerson(Person person);
+    void updatePerson(Person person);
+    void deletePerson(Person person);
 }

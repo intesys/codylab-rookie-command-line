@@ -1,8 +1,8 @@
 package it.intesys.codylab.rookie.commandline.frontend;
 
+import it.intesys.codylab.rookie.commandline.Person;
+import it.intesys.codylab.rookie.commandline.PersonService;
 import it.intesys.codylab.rookie.commandline.RigaDiComando;
-import it.intesys.codylab.rookie.domain.Person;
-import it.intesys.codylab.rookie.service.PersonService;
 
 import java.io.*;
 import java.net.Socket;

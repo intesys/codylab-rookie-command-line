@@ -1,9 +1,5 @@
 package it.intesys.codylab.rookie.commandline;
 
-import it.intesys.codylab.rookie.domain.Person;
-import it.intesys.codylab.rookie.service.PersonService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.io.IOException;
