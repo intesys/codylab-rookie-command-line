@@ -1,6 +1,6 @@
 package it.intesys.codylab.rookie.exception;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends ServiceException {
     Class<?> entityClass;
 
     public NotFoundException(Class<?> entityClass, Long id) {

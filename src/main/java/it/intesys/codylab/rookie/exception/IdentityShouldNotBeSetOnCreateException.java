@@ -1,8 +1,6 @@
 package it.intesys.codylab.rookie.exception;
 
-import it.intesys.codylab.rookie.domain.Person;
-
-public class IdentityShouldNotBeSetOnCreateException extends RuntimeException {
+public class IdentityShouldNotBeSetOnCreateException extends ServiceException {
     Class<?> entityClass;
 
     public IdentityShouldNotBeSetOnCreateException(Class<?> entityClass) {

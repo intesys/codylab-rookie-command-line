@@ -5,7 +5,7 @@ import it.intesys.codylab.rookie.domain.Product;
 import it.intesys.codylab.rookie.exception.IdentityShouldNotBeSetOnCreateException;
 import it.intesys.codylab.rookie.exception.MandatoryIdentityException;
 import it.intesys.codylab.rookie.exception.NotFoundException;
-import it.intesys.codylab.rookie.exception.ProductNotAvailable;
+import it.intesys.codylab.rookie.exception.ProductNotAvailableException;
 import it.intesys.codylab.rookie.repository.OrderRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class OrderService {
     private void checkQuantity(Order order) {
         Product product = productService.findProduct(order.product.id);
         if (product.quantity < order.quantity)
-            throw new ProductNotAvailable(product, order.quantity);
+            throw new ProductNotAvailableException(product, order.quantity);
     }
 
     public void updateOrder(Order order) {

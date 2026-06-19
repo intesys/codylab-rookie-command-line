@@ -2,7 +2,7 @@ package it.intesys.codylab.rookie.exception;
 
 import it.intesys.codylab.rookie.domain.Person;
 
-public class MandatoryIdentityException extends RuntimeException {
+public class MandatoryIdentityException extends ServiceException {
     Class<?> entityClass;
 
     public MandatoryIdentityException(Class<?> entityClass) {
