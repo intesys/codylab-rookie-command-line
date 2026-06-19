@@ -1,7 +1,7 @@
 package it.intesys.codylab.rookie.api;
 
 import it.intesys.codylab.rookie.domain.Person;
-import it.intesys.codylab.rookie.mapper.PersonaMapper;
+import it.intesys.codylab.rookie.mapper.PersonMapper;
 import it.intesys.codylab.rookie.service.PersonService;
 import it.intesys.codylab.rookie.web.api.PersonApiDelegate;
 import it.intesys.codylab.rookie.web.api.model.PersonApiDTO;
@@ -14,9 +14,9 @@ import java.util.List;
 @RestController
 public class PersonApiDelegateImpl implements PersonApiDelegate {
     final PersonService personService;
-    final PersonaMapper personMapper;
+    final PersonMapper personMapper;
 
-    public PersonApiDelegateImpl(PersonService personService, PersonaMapper personMapper) {
+    public PersonApiDelegateImpl(PersonService personService, PersonMapper personMapper) {
         this.personService = personService;
         this.personMapper = personMapper;
     }
@@ -65,7 +65,7 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
     public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO filterDTO) {
         List<Person> people = personService.findPeople(filterDTO.getId(), filterDTO.getText());
         List<PersonApiDTO> peopleDTO = people.stream()
-                .map(person -> personMapper.toDTO(person))
+                .map(personMapper::toDTO)
                 .toList();
         return ResponseEntity.ok(peopleDTO);
 

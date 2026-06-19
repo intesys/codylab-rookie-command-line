@@ -30,15 +30,10 @@ public class Person {
         this.registrationDate = registrationDate;
     }
 
-    public String toString(boolean longFormat) {
-        if (longFormat) {
-            return "\nPerson (id: " + id + ",\n" +
-                "name: " + name + ",\n" +
-                "surname: " + surname + ",\n" +
-                "registrationDate: " + registrationDate + ")\n";
-        } else {
-            return "Person (id: " + id  + ")";
-        }
+    public String toString() {
+        return "\nPerson (id: " + id + ",\n" +
+            "name: " + name + ",\n" +
+            "surname: " + surname + ",\n" +
+            "registrationDate: " + registrationDate + ")\n";
     }
-
 }

@@ -5,7 +5,7 @@ import it.intesys.codylab.rookie.web.api.model.PersonApiDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface PersonaMapper {
+public interface PersonMapper {
     Person toPerson (PersonApiDTO personApiDTO);
     PersonApiDTO toDTO (Person person);
 }
