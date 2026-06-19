@@ -1,6 +1,7 @@
 package it.intesys.codylab.rookie.api;
 
 import it.intesys.codylab.rookie.domain.Person;
+import it.intesys.codylab.rookie.mapper.PersonaMapper;
 import it.intesys.codylab.rookie.service.PersonService;
 import it.intesys.codylab.rookie.web.api.PersonApiDelegate;
 import it.intesys.codylab.rookie.web.api.model.PersonApiDTO;
@@ -8,32 +9,23 @@ import it.intesys.codylab.rookie.web.api.model.PersonFilterApiDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class PersonApiDelegateImpl implements PersonApiDelegate {
     final PersonService personService;
+    final PersonaMapper personMapper;
 
-    public PersonApiDelegateImpl(PersonService personService) {
+    public PersonApiDelegateImpl(PersonService personService, PersonaMapper personMapper) {
         this.personService = personService;
+        this.personMapper = personMapper;
     }
 
     @Override
     public ResponseEntity<PersonApiDTO> getPerson(Long id) {
         Person person = personService.findPerson(id);
-        PersonApiDTO personApiDTO = map (person);
+        PersonApiDTO personApiDTO = personMapper.toDTO(person);
         return ResponseEntity.ok(personApiDTO);
-    }
-
-    private PersonApiDTO map(Person person) {
-        PersonApiDTO personApiDTO = new PersonApiDTO();
-        personApiDTO.setId(person.id);
-        personApiDTO.setId(person.id);
-        personApiDTO.setName(person.name);
-        personApiDTO.setSurname(person.surname);
-        personApiDTO.setRegistrationDate(person.registrationDate);
-        return personApiDTO;
     }
 
     @Override
@@ -46,13 +38,9 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
         return ResponseEntity.ok(personApiDTO);
     }
 
-    private static Person map(Long id, PersonApiDTO personApiDTO) {
-        Person person = new Person();
-
+    private Person map(Long id, PersonApiDTO personApiDTO) {
+        Person person = personMapper.toPerson(personApiDTO);
         person.id = id != null? id : personApiDTO.getId();
-        person.name = personApiDTO.getName();
-        person.surname = personApiDTO.getSurname();
-        person.registrationDate = personApiDTO.getRegistrationDate();
         return person;
     }
 
@@ -77,7 +65,7 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
     public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO filterDTO) {
         List<Person> people = personService.findPeople(filterDTO.getId(), filterDTO.getText());
         List<PersonApiDTO> peopleDTO = people.stream()
-                .map(this::map)
+                .map(person -> personMapper.toDTO(person))
                 .toList();
         return ResponseEntity.ok(peopleDTO);
 
