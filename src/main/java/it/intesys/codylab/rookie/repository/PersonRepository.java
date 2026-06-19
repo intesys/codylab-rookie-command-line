@@ -1,6 +1,7 @@
 package it.intesys.codylab.rookie.repository;
 
 import it.intesys.codylab.rookie.domain.Person;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +18,5 @@ public interface PersonRepository extends CrudRepository<Person, Long> {
         and (:text is null
             or lower (name) like concat ('%', lower (:text), '%')
             or lower (surname) like concat ('%', lower (:text), '%'))""", nativeQuery = true)
-    List<Person> findPeople(@Param("id") Long id, @Param("text") String text);
+    List<Person> findPeople(@Param("id") Long id, @Param("text") String text, Pageable pageable);
 }

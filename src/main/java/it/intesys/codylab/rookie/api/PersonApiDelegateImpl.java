@@ -6,6 +6,8 @@ import it.intesys.codylab.rookie.service.PersonService;
 import it.intesys.codylab.rookie.web.api.PersonApiDelegate;
 import it.intesys.codylab.rookie.web.api.model.PersonApiDTO;
 import it.intesys.codylab.rookie.web.api.model.PersonFilterApiDTO;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,7 +65,8 @@ public class PersonApiDelegateImpl implements PersonApiDelegate {
 
     @Override
     public ResponseEntity<List<PersonApiDTO>> findPeople(Integer page, Integer size, String sort, PersonFilterApiDTO filterDTO) {
-        List<Person> people = personService.findPeople(filterDTO.getId(), filterDTO.getText());
+        Pageable pageable = Pagination.buildPageable(page, size, sort);
+        List<Person> people = personService.findPeople(filterDTO.getId(), filterDTO.getText(), pageable);
         List<PersonApiDTO> peopleDTO = people.stream()
                 .map(personMapper::toDTO)
                 .toList();

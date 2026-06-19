@@ -6,6 +6,7 @@ import it.intesys.codylab.rookie.service.OrderService;
 import it.intesys.codylab.rookie.web.api.OrderApiDelegate;
 import it.intesys.codylab.rookie.web.api.model.OrderApiDTO;
 import it.intesys.codylab.rookie.web.api.model.OrderFilterApiDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,7 +64,8 @@ public class OrderApiDelegateImpl implements OrderApiDelegate {
 
     @Override
     public ResponseEntity<List<OrderApiDTO>> findOrders(Integer page, Integer size, String sort, OrderFilterApiDTO filterDTO) {
-        List<Order> people = orderService.findOrders(filterDTO.getId(), filterDTO.getText(), filterDTO.getCreateDateFrom(), filterDTO.getCreateDateTo());
+        Pageable pageable = Pagination.buildPageable(page, size, sort);
+        List<Order> people = orderService.findOrders(filterDTO.getId(), filterDTO.getText(), filterDTO.getCreateDateFrom(), filterDTO.getCreateDateTo(), pageable);
         List<OrderApiDTO> peopleDTO = people.stream()
                 .map(orderMapper::toDTO)
                 .toList();

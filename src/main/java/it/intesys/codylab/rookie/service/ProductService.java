@@ -6,6 +6,7 @@ import it.intesys.codylab.rookie.exception.MandatoryIdentityException;
 import it.intesys.codylab.rookie.exception.NotFoundException;
 import it.intesys.codylab.rookie.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public class ProductService {
         return optionalProduct;
     }
 
-    public List<Product> findProducts(Long id, String text) {
-        return productRepository.findProducts(id, text);
+    public List<Product> findProducts(Long id, String text, Pageable pageable) {
+        return productRepository.findProducts(id, text, pageable);
     }
 }

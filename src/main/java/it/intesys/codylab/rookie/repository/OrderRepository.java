@@ -1,7 +1,7 @@
 package it.intesys.codylab.rookie.repository;
 
 import it.intesys.codylab.rookie.domain.Order;
-import it.intesys.codylab.rookie.domain.Person;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -31,5 +31,5 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     List<Order> findOrders(@Param("id") Long id,
                            @Param("text") String text,
                            @Param ("createDateFrom") Instant createDateFrom,
-                           @Param ("createDateTo") Instant createDateTo);
+                           @Param ("createDateTo") Instant createDateTo, Pageable pageable);
 }

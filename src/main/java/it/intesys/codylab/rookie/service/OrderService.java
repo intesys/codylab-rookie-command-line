@@ -6,7 +6,7 @@ import it.intesys.codylab.rookie.exception.MandatoryIdentityException;
 import it.intesys.codylab.rookie.exception.NotFoundException;
 import it.intesys.codylab.rookie.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -57,7 +57,7 @@ public class OrderService {
         }
     }
 
-    public List<Order> findOrders(Long id, String text, Instant createDateFrom, Instant createDateTo) {
-        return orderRepository.findOrders(id, text, createDateFrom, createDateTo);
+    public List<Order> findOrders(Long id, String text, Instant createDateFrom, Instant createDateTo, Pageable pageable) {
+        return orderRepository.findOrders(id, text, createDateFrom, createDateTo, pageable);
     }
 }

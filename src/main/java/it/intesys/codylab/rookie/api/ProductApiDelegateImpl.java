@@ -6,6 +6,7 @@ import it.intesys.codylab.rookie.service.ProductService;
 import it.intesys.codylab.rookie.web.api.ProductApiDelegate;
 import it.intesys.codylab.rookie.web.api.model.ProductApiDTO;
 import it.intesys.codylab.rookie.web.api.model.ProductFilterApiDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,7 +64,8 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 
     @Override
     public ResponseEntity<List<ProductApiDTO>> findProducts(Integer page, Integer size, String sort, ProductFilterApiDTO filterDTO) {
-        List<Product> people = productService.findProducts(filterDTO.getId(), filterDTO.getText());
+        Pageable pageable = Pagination.buildPageable(page, size, sort);
+        List<Product> people = productService.findProducts(filterDTO.getId(), filterDTO.getText(), pageable);
         List<ProductApiDTO> peopleDTO = people.stream()
                 .map(productMapper::toDTO)
                 .toList();
