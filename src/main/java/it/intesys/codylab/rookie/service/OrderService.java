@@ -1,11 +1,12 @@
 package it.intesys.codylab.rookie.service;
 
 import it.intesys.codylab.rookie.domain.Order;
+import it.intesys.codylab.rookie.domain.Product;
 import it.intesys.codylab.rookie.exception.IdentityShouldNotBeSetOnCreateException;
 import it.intesys.codylab.rookie.exception.MandatoryIdentityException;
 import it.intesys.codylab.rookie.exception.NotFoundException;
+import it.intesys.codylab.rookie.exception.ProductNotAvailable;
 import it.intesys.codylab.rookie.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +16,12 @@ import java.util.Optional;
 
 @Service
 public class OrderService {
-    OrderRepository orderRepository;
+    final OrderRepository orderRepository;
+    final ProductService productService;
 
-    public OrderService() {
-    }
-
-    @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, ProductService productService) {
         this.orderRepository = orderRepository;
+        this.productService = productService;
     }
 
 
@@ -31,7 +30,20 @@ public class OrderService {
             throw new IdentityShouldNotBeSetOnCreateException(Order.class);
         order.createDate =  Instant.now();
 
+        checkQuantity (order);
+        decreaseQuantity(order);
         return orderRepository.save(order);
+    }
+
+    private void decreaseQuantity(Order order) {
+        Product product = productService.findProduct(order.product.id);
+        product.quantity -= order.quantity;
+    }
+
+    private void checkQuantity(Order order) {
+        Product product = productService.findProduct(order.product.id);
+        if (product.quantity < order.quantity)
+            throw new ProductNotAvailable(product, order.quantity);
     }
 
     public void updateOrder(Order order) {
